@@ -57,15 +57,16 @@ class ooSpectro:
         '''
             
         def setChannel(self, chan):
-            self.s2000.write(b'H'+str(chan)+'\x0D')
+            
+            self.s2000.write(b"'H'+str(chan)+'\x0D'")
             time.sleep(0.1)
             
         '''
         Set integration time in milliseconds, range 5-65535
         '''
-        def setIntegrationTime(self, time):
-            self.s2000.write(b'I'+str(time)+'\x0D')
-            time.sleep(0.1)
+        def setIntegrationTime(self, intTime):
+           self.s2000.write(('I'+str(intTime)+'\x0D').encode())
+           time.sleep(0.1)
             
         '''
         TODO Lamp
@@ -104,7 +105,7 @@ class ooSpectro:
         '''
         def resetDefault(self):
             self.s2000.write(b'Q\x0D')
-            time.sleep(1)
+            time.sleep(0.1)
             
         '''
         Returns list with measurments as set up before
@@ -116,7 +117,8 @@ class ooSpectro:
             time.sleep(1)
             self.s2000.write(b'S\x0D')
             rawStr = self.s2000.readline().decode("utf-8").split(" ")
-            rawStr = rawStr[:-1]
+            del rawStr[-1]
+            del rawStr[-1]
             del rawStr[0:8]
             raw=[]
             for i in range(len(rawStr)):
@@ -181,25 +183,31 @@ class ooSpectro:
         def identify(self, time):
             return
             
-        def doDarkCompensation(channel):
-            print("Cover the measurment chanel and press any key")
-            input()
-            self.setChannel(channel)
-            dark = self.getSpectrum()
-            np.savetxt('cal\darkComp_Channel'+str(channel)+'.txt', dark.view(int).reshape(-1, 2)) #Save array to file
-            print("Values saved")
+        def doDarkCompensation(self, channel):
+            print("Do you want to take a dark measurment [y/n]?")
+            if(input() == 'y'):
+                print("Cover the measurment chanel and press any key")
+                input()
+                print("Collecting Data")
+                self.setChannel(channel)
+                dark = self.getSpectrum()
+                np.savetxt('cal\darkComp_Channel'+str(channel)+'.txt', dark) #Save array to file
+                print("Values saved")
+            else:
+                return
             
-        def getCompensatedSpectrum(channel):
+        def getCompensatedSpectrum(self, channel):
             self.setChannel(channel)
             compensated = []
             measured = self.getSpectrum()
-            dark = np.loadtxt('cal\darkComp_Channel'+str(channel)+'.txt').reshape(-1) #Read array from file
+            dark = np.loadtxt('cal\darkComp_Channel'+str(channel)+'.txt') #Read array from file
             if(len(measured) != len(dark)):
                 print("Lenghts of dark compensation does not match")
                 return
-            for i in range(len(dark)):
-                compensated[i] = measured[i] - dark[i]
-            return compensated
+            else:
+                for i in range(len(dark)):
+                    compensated.append(measured[i] - dark[i])
+                return compensated
         
 
             
