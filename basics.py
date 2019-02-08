@@ -7,17 +7,17 @@ Created on Thu Feb  7 23:11:49 2019
 
 
 import ooadc
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import pyqtgraph as pg
 
 
 spec1 = ooadc.ooSpectro(10)
 #print(spec1.getSpectrum())n
 ch = 0
-spec1.setIntegrationTime(500)
-spec1.doDarkCompensation(ch)
+spec1.setIntegrationTime(100)
+#spec1.doDarkCompensation(ch)
 pg.plot(spec1.getCompensatedSpectrum(ch))
-
+pg.QtGui.QApplication.exec_()
 
 del spec1 
 

@@ -9,7 +9,6 @@ Wrapper class for all the RS232 functionality of the ADC1000 board from ocean op
 
 import serial 
 import time
-import matplotlib.pyplot as plt
 import numpy as np
 
 class ooSpectro:
