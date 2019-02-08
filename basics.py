@@ -6,9 +6,22 @@ Created on Thu Feb  7 23:11:49 2019
 """
 
 
+import ooadc
+
+spec1 = ooadc.ooSpectro(10)
+print(spec1.getSpectrum())
+
+del spec1 
+
+
+
+
+
+'''
 import serial 
 import time
 import matplotlib.pyplot as plt
+
 
 s2000 = serial.Serial('COM10', 9600, timeout=1)
 setToBinary = b'\x61\x41\x0D'
@@ -34,7 +47,7 @@ plt.plot(raw)
 plt.show()
     
 
-
+'''
 
     
 
