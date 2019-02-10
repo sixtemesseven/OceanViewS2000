@@ -223,6 +223,8 @@ class ooSpectro:
                     compensated.append(measured[i] - dark[i])
                 return compensated
             
+            
+            
         
 
             

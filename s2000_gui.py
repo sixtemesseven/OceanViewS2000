@@ -26,6 +26,8 @@ ooS = ooadc.ooSpectro()
 
 
 class MainWindow(TemplateBaseClass):  
+    plotNr = 1
+    channel = 0
     def __init__(self):
         TemplateBaseClass.__init__(self)
         self.setWindowTitle('pyqtgraph example: Qt Designer')
@@ -35,6 +37,7 @@ class MainWindow(TemplateBaseClass):
         self.ui.setupUi(self)
         self.ui.PlotSpectrum.clicked.connect(self.plotGraph)
         self.ui.ConnectPort.clicked.connect(self.connectCom)
+        self.ui.Channel.clicked.connect(self.setChannel)
         self.ui.ResetDefaults.clicked.connect(self.resetDefaults)
         self.ui.ClearPlot.clicked.connect(self.clearPlot)
         
@@ -45,20 +48,29 @@ class MainWindow(TemplateBaseClass):
         self.ui.PlotTo.valueChanged.connect(self.setSpectrometer)
         self.show()
         
+    #Sets Channel
+    def setChannel(self):
+        self.channel = self.ui.SingleChannel.value()
+        ooS.setChannel(self.channel)
+        
     #Plotting the spectrum graph
     def plotGraph(self):
-        X=[]
-        for i in range(100):
-            X.append(random.random())
-        
-        w = self.ui.graphicsView
-        w.plot(X)
-        
+        #for i in range(100):
+        #    X.append(random.random())
+        X = ooS.getSpectrum()
 
+        
+        
+        
+        w = self.ui.graphicsView.plot(X)
+        w.addLegend(offset=(self.plotNr*60, 30))
+        #TODO optional numbering w.plot(X, name=" Nr: "+str(self.plotNr), pen=self.plotNr)
+        self.plotNr = self.plotNr + 1
         
     #Clear old plots
     def clearPlot(self):
         self.ui.graphicsView.clear()
+        self.plotNr = 1
         return
         
         
@@ -96,4 +108,5 @@ if __name__ == '__main__':
     import sys
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
         QtGui.QApplication.instance().exec_()
+        ooS.__del__ #Clean up spectrometer and port
 
