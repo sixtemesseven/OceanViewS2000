@@ -10,15 +10,30 @@ Wrapper class for all the RS232 functionality of the ADC1000 board from ocean op
 import serial 
 import time
 import numpy as np
+from serial import SerialException
 
 class ooSpectro:
-        def __init__(self, port):
-            self.s2000 = serial.Serial('COM'+str(port), 9600, timeout=1)
+        firstConnect = False
+        def __init__(self):
+            return
+            
+        def connectSpectrometer(self, port):
+            if self.firstConnect == True:
+                if self.s2000.isOpen() == True:
+                    self.s2000.close()
+            self.firstConnect = True
+            try:
+                self.s2000 = serial.Serial('COM'+str(port), 9600, timeout=1)
+            except SerialException:
+                return False
             self.setAsciiMode()
             self.resetDefault()
+            return True
             
         def __del__(self):
-            self.s2000.close()
+            if self.s2000:
+                if(self.s2000.isOpen() == True):
+                    self.s2000.close()
         
         '''
         Sums up number of readings (1-15)
