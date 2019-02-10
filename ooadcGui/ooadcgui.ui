@@ -49,7 +49,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="clearPlot">
+      <widget class="QPushButton" name="ClearPlot">
        <property name="text">
         <string>Clear Plot</string>
        </property>
@@ -151,7 +151,11 @@
           <widget class="QSpinBox" name="PlotFrom"/>
          </item>
          <item>
-          <widget class="QSpinBox" name="PlotTo"/>
+          <widget class="QSpinBox" name="PlotTo">
+           <property name="maximum">
+            <number>2048</number>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -160,7 +164,14 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_4">
        <item>
-        <widget class="QSpinBox" name="IntegrationTime"/>
+        <widget class="QSpinBox" name="IntegrationTime">
+         <property name="minimum">
+          <number>5</number>
+         </property>
+         <property name="maximum">
+          <number>65300</number>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QLabel" name="label">
@@ -174,7 +185,14 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_5">
        <item>
-        <widget class="QSpinBox" name="BoxcartWidth"/>
+        <widget class="QSpinBox" name="BoxcartWidth">
+         <property name="minimum">
+          <number>1</number>
+         </property>
+         <property name="maximum">
+          <number>15</number>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QLabel" name="label_3">
@@ -188,7 +206,11 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_6">
        <item>
-        <widget class="QSpinBox" name="Average"/>
+        <widget class="QSpinBox" name="Average">
+         <property name="maximum">
+          <number>15</number>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QLabel" name="label_2">

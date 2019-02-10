@@ -12,6 +12,7 @@ import os
 import random
 import ooadc
 import PyQt5.QtGui as qt
+import time
 
 
 pg.mkQApp()
@@ -35,6 +36,7 @@ class MainWindow(TemplateBaseClass):
         self.ui.PlotSpectrum.clicked.connect(self.plotGraph)
         self.ui.ConnectPort.clicked.connect(self.connectCom)
         self.ui.ResetDefaults.clicked.connect(self.resetDefaults)
+        self.ui.ClearPlot.clicked.connect(self.clearPlot)
         
         self.ui.IntegrationTime.valueChanged.connect(self.setSpectrometer)
         self.ui.BoxcartWidth.valueChanged.connect(self.setSpectrometer)
@@ -48,11 +50,15 @@ class MainWindow(TemplateBaseClass):
         X=[]
         for i in range(100):
             X.append(random.random())
-        self.ui.graphicsView.plot(X)
+        
+        w = self.ui.graphicsView
+        w.plot(X)
+        
+
         
     #Clear old plots
     def clearPlot(self):
-        
+        self.ui.graphicsView.clear()
         return
         
         
