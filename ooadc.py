@@ -207,6 +207,7 @@ class ooSpectro:
                 for i in range(len(dark)):
                     compensated.append(measured[i] - dark[i])
                 return compensated
+            
         
 
             

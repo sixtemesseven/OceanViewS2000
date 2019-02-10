@@ -1,26 +1,16 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Feb  7 23:11:49 2019
-
-@author: justRandom
-"""
-
-
 import ooadc
 #import matplotlib.pyplot as plt
 import pyqtgraph as pg
+import numpy as np
 
-
-spec1 = ooadc.ooSpectro(10)
+spec1 = ooadc.ooSpectro(14)
 #print(spec1.getSpectrum())n
 ch = 0
-spec1.setIntegrationTime(100)
+spec1.setIntegrationTime(200)
 #spec1.doDarkCompensation(ch)
-pg.plot(spec1.getCompensatedSpectrum(ch))
-pg.QtGui.QApplication.exec_()
-
+yAxis = np.loadtxt('cal/H0X.txt') #Read array from file
+pg.plot(yAxis, spec1.getCompensatedSpectrum(ch))
 del spec1 
-
 
 
 
