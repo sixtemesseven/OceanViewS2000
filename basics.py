@@ -1,7 +1,14 @@
-import ooadc
-#import matplotlib.pyplot as plt
 import pyqtgraph as pg
 import numpy as np
+import ooadc
+
+ss = ooadc.ooSpectro()
+print(ss.connectSpectrometer(15))
+
+
+
+
+'''
 
 spec1 = ooadc.ooSpectro(14)
 #print(spec1.getSpectrum())n
@@ -13,9 +20,6 @@ pg.plot(yAxis, spec1.getCompensatedSpectrum(ch))
 del spec1 
 
 
-
-
-'''
 import serial 
 import time
 import matplotlib.pyplot as plt

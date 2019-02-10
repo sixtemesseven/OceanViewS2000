@@ -7,6 +7,8 @@ Created on Fri Feb  8 14:50:11 2019
 Wrapper class for all the RS232 functionality of the ADC1000 board from ocean optics
 """
 
+#TODO Get a popup window on connect to open serial port 
+
 import serial 
 import time
 import numpy as np
@@ -14,6 +16,7 @@ from serial import SerialException
 
 class ooSpectro:
         firstConnect = False
+        s2000 = serial
         def __init__(self):
             return
             
@@ -31,15 +34,15 @@ class ooSpectro:
             return True
             
         def __del__(self):
-            if self.s2000:
-                if(self.s2000.isOpen() == True):
-                    self.s2000.close()
+            if self.firstConnect == True:
+                self.s2000.close()
+            del self.s2000
         
         '''
         Sums up number of readings (1-15)
         '''
         def addScans(self, scans):
-            self.self.s2000.write(b'A'+str(scans)+'\x0D')
+            self.s2000.write(b'A'+str(scans)+'\x0D')
             time.sleep(0.1)
         
         '''
@@ -48,7 +51,7 @@ class ooSpectro:
         n > 3 will slow things down
         '''                
         def setPixelBoxcardWidth(self, n):
-            self.s2000.write(b'B'+str(n)+'\x0D')
+            self.s2000.write(("B"+str(n)+"\x0D").encode)
             time.sleep(0.1)
         
         '''
@@ -59,7 +62,7 @@ class ooSpectro:
             if(status == 0):
                 self.s2000.write(b'G0\x0D')
             if(status == 1):
-                self.s2000.write(b'G0!\x0D')
+                self.s2000.write(b"G0!\x0D")
             else:
                 print("setDataCompression out of range")
             time.sleep(0.1)
@@ -69,10 +72,8 @@ class ooSpectro:
         Or to use a rotator feature
         Rotator is active if chan > 255
         '''
-            
-        def setChannel(self, chan):
-            
-            self.s2000.write(b"'H'+str(chan)+'\x0D'")
+        def setChannel(self, chan): 
+            self.s2000.write(('H'+str(chan)+'\x0D').encode)
             time.sleep(0.1)
             
         '''
@@ -107,9 +108,9 @@ class ooSpectro:
             if(mode == 0):
                 self.s2000.write(b'P0\x0D')
             if(mode == 1):
-                self.s2000.write(b'P1'+str(n)+'\x0D')
+                self.s2000.write(('P1'+str(n)+'\x0D').encode)
             if(mode == 3):
-                self.s2000.write(b'P3'+str(x)+str(y)+str(n)+'\x0D') 
+                self.s2000.write(('P3'+str(x)+str(y)+str(n)+'\x0D').encode)
             else:
                 print("Partial Pixel Mode out of range")   
             time.sleep(0.1)
@@ -128,7 +129,7 @@ class ooSpectro:
             rawStr = []
             self.s2000.reset_output_buffer()
             self.s2000.reset_input_buffer()
-            time.sleep(1)
+            time.sleep(0.1)
             self.s2000.write(b'S\x0D')
             rawStr = self.s2000.readline().decode("utf-8").split(" ")
             del rawStr[-1]
@@ -197,18 +198,12 @@ class ooSpectro:
         def identify(self, time):
             return
             
-        def doDarkCompensation(self, channel):
-            print("Do you want to take a dark measurment [y/n]?")
-            if(input() == 'y'):
-                print("Cover the measurment chanel and press any key")
-                input()
-                print("Collecting Data")
-                self.setChannel(channel)
-                dark = self.getSpectrum()
-                np.savetxt('cal\darkComp_Channel'+str(channel)+'.txt', dark) #Save array to file
-                print("Values saved")
-            else:
-                return
+        def getDarkCompensation(self, channel):
+            self.setChannel(channel)
+            dark = self.getSpectrum()
+            np.savetxt('cal\darkComp_Channel'+str(channel)+'.txt', dark) #Save array to file
+            return(dark)
+            
             
         def getCompensatedSpectrum(self, channel):
             self.setChannel(channel)
@@ -222,6 +217,25 @@ class ooSpectro:
                 for i in range(len(dark)):
                     compensated.append(measured[i] - dark[i])
                 return compensated
+            
+        def getCalData(self):
+            rawStr = []
+            self.s2000.reset_output_buffer()
+            self.s2000.reset_input_buffer()
+            time.sleep(1)
+            self.s2000.write(b'S\x0D')
+            rawStr = self.s2000.readline().decode("utf-8").split(" ")
+            del rawStr[-1]
+            del rawStr[-1]
+            del rawStr[0:8]
+            raw=[]
+            for i in range(len(rawStr)):
+                raw.append(int(rawStr[i]))
+            return raw 
+            
+
+
+            
             
             
             

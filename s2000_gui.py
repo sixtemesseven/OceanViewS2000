@@ -13,6 +13,7 @@ import random
 import ooadc
 import PyQt5.QtGui as qt
 import time
+import sys
 
 
 pg.mkQApp()
@@ -40,6 +41,8 @@ class MainWindow(TemplateBaseClass):
         self.ui.Channel.clicked.connect(self.setChannel)
         self.ui.ResetDefaults.clicked.connect(self.resetDefaults)
         self.ui.ClearPlot.clicked.connect(self.clearPlot)
+        self.ui.GetDarkMeasurment.clicked.connect(self.darkComp())
+        #self.ui.GetCal.clicked.connect(ooS.getCalData())
         
         self.ui.IntegrationTime.valueChanged.connect(self.setSpectrometer)
         self.ui.BoxcartWidth.valueChanged.connect(self.setSpectrometer)
@@ -47,6 +50,9 @@ class MainWindow(TemplateBaseClass):
         self.ui.PlotFrom.valueChanged.connect(self.setSpectrometer)
         self.ui.PlotTo.valueChanged.connect(self.setSpectrometer)
         self.show()
+        
+    def darkComp(self):
+        ooS.getDarkCompensation(self.channel)
         
     #Sets Channel
     def setChannel(self):
@@ -57,10 +63,12 @@ class MainWindow(TemplateBaseClass):
     def plotGraph(self):
         #for i in range(100):
         #    X.append(random.random())
-        X = ooS.getSpectrum()
-
+        X = ooS.getSpectrum()      
         
-        
+        if(self.ui.ApplyDarkMeasurment.checkStateSet() == True):
+            X = ooS.getSpectrum()
+        else:
+            X = ooS.getCompensatedSpectrum(self.channel)          
         
         w = self.ui.graphicsView.plot(X)
         w.addLegend(offset=(self.plotNr*60, 30))
@@ -105,8 +113,7 @@ win = MainWindow()
 
 
 if __name__ == '__main__':
-    import sys
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
         QtGui.QApplication.instance().exec_()
-        ooS.__del__ #Clean up spectrometer and port
+        ooS.__del__
 
