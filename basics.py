@@ -5,12 +5,24 @@ import ooadc
 import serial
 import serial.tools.list_ports
 
+l = []
+for i in range(20):
+    l.append(i)
+print(l[1])
 
+d = []
+for i in range(20):
+    d.append(i/2)
+print(l[1])
 
+pg.plot(l,d)
+
+'''
 ssO = ooadc.ooSpectro()
 ssO.connectCom(14)
 print(ssO.getCalData(0))
 ssO.__del__
+'''
 
 
 

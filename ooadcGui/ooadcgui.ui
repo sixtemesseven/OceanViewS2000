@@ -274,20 +274,13 @@
          <item>
           <layout class="QFormLayout" name="formLayout">
            <item row="0" column="0">
-            <widget class="QPushButton" name="GetCal">
+            <widget class="QLabel" name="label_8">
              <property name="text">
-              <string>GetCal</string>
+              <string>I</string>
              </property>
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QPushButton" name="WriteCal">
-             <property name="text">
-              <string>WriteCal</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
             <widget class="QDoubleSpinBox" name="IValue">
              <property name="decimals">
               <number>6</number>
@@ -300,7 +293,14 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_9">
+             <property name="text">
+              <string>C0</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
             <widget class="QDoubleSpinBox" name="C0Value">
              <property name="decimals">
               <number>6</number>
@@ -313,7 +313,14 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="1">
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_10">
+             <property name="text">
+              <string>C1</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
             <widget class="QDoubleSpinBox" name="C1Value">
              <property name="decimals">
               <number>6</number>
@@ -326,7 +333,14 @@
              </property>
             </widget>
            </item>
-           <item row="4" column="1">
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_11">
+             <property name="text">
+              <string>C2</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
             <widget class="QDoubleSpinBox" name="C2Value">
              <property name="decimals">
               <number>6</number>
@@ -339,40 +353,19 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_8">
-             <property name="text">
-              <string>I</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_9">
-             <property name="text">
-              <string>C0</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_10">
-             <property name="text">
-              <string>C1</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_11">
-             <property name="text">
-              <string>C2</string>
-             </property>
-            </widget>
-           </item>
           </layout>
          </item>
          <item>
           <widget class="QPushButton" name="PlotCalCurve">
            <property name="text">
             <string>PlotCalCurve</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="WriteCal">
+           <property name="text">
+            <string>WriteCal</string>
            </property>
           </widget>
          </item>

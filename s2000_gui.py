@@ -40,29 +40,38 @@ class MainWindow(TemplateBaseClass):
         self.ooS.__del__
         
     def __init__(self):
-        
+        #Set up main ui winows (goes first!)
         TemplateBaseClass.__init__(self)
         self.setWindowTitle('pyqtgraph example: Qt Designer')    
-        
-        self.ooS = ooadc.ooSpectro()
-        self.portInput()
         
         # Create the main window
         self.ui = WindowTemplate()
         self.ui.setupUi(self)
+        #Setup Serial Port
+        self.ooS = ooadc.ooSpectro()
+        self.portInput()
+        #Get the calData for default Port(0) - Will be updated once channel is changed
+        self.setChannel() 
+        #Buttons
+        self.ui.WriteCal.clicked.connect(self.updateCalData)
         self.ui.PlotSpectrum.clicked.connect(self.plotGraph)
         self.ui.Channel.clicked.connect(self.setChannel)
         self.ui.ResetDefaults.clicked.connect(self.resetDefaults)
         self.ui.ClearPlot.clicked.connect(self.clearPlot)
         self.ui.GetDarkMeasurment.clicked.connect(self.darkComp)
-        self.ui.GetCal.clicked.connect(self.getCalData)
-        
+        self.ui.PlotCalCurve.clicked.connect(self.plotCalData) 
+        #Spin Boxes on value changed
         self.ui.IntegrationTime.valueChanged.connect(self.setSpectrometer)
         self.ui.BoxcartWidth.valueChanged.connect(self.setSpectrometer)
         self.ui.Average.valueChanged.connect(self.setSpectrometer)
         self.ui.PlotFrom.valueChanged.connect(self.setSpectrometer)
         self.ui.PlotTo.valueChanged.connect(self.setSpectrometer)
         self.show()
+    
+    def updateCalData(self):
+        #TODO Strong Warning before updating
+        #TODO Change Cal Values
+        return
     
     def portInput(self):
         PORT, okPressed = QInputDialog.getInt(None,"Get ADC1000 Serial Port","COM PORT:", 1, 0, 100, 1)
@@ -77,28 +86,35 @@ class MainWindow(TemplateBaseClass):
                 sys.exit()
         
     def darkComp(self):
-        self.ooS.getDarkCompensation(self.channel)
+        self.ooS.getDarkCompensation(self.channelActive)
         
     #Sets Channel
     def setChannel(self):
+        #Get the channel to be activated from the input spin box
         self.channelActive = self.ui.SingleChannel.value()
+        #Set the new globaly active channel
         self.ooS.setChannel(self.channelActive)
+        #get new cal data from eeprom
+        self.calData = self.ooS.getCalData(self.channelActive)
+        #calculate new Y axis range
+        self.XScaleList = self.ooS.calculateXScale(self.calData)
+        #Update cal value box
+        self.ui.IValue.setValue(self.calData[0])
+        self.ui.C0Value.setValue(self.calData[1])
+        self.ui.C1Value.setValue(self.calData[2])
+        self.ui.C2Value.setValue(self.calData[3])
         
     #Plotting the spectrum graph
     def plotGraph(self):
-        #for i in range(100):
-        #    X.append(random.random())
-        X = self.ooS.getSpectrum()      
-        
-        if(self.ui.ApplyDarkMeasurment.checkStateSet() == False):
-            X = self.ooS.getSpectrum()
+        if(self.ui.ApplyDarkMeasurment.isChecked()):
+            Y = self.ooS.getSpectrum()
         else:
-            X = self.ooS.getCompensatedSpectrum(self.channel)          
-        
-        w = self.ui.graphicsView.plot(X, name='')
-        w.addLegend(offset=(self.plotNr*60, 30))
-        w.plot(X, name=" Nr: "+str(self.plotNr), pen=self.plotNr)
-        self.plotNr = self.plotNr + 1
+            Y = self.ooS.getCompensatedSpectrum(self.channelActive)          
+        X = self.XScaleList  
+        self.ui.graphicsView.plot(X,Y,name = " Nr: "+str(self.plotNr),pen=self.plotNr)       
+        if(self.ui.ChangeColors.isChecked()):
+            self.plotNr = self.plotNr + 1
+            print(self.plotNr)
         
     #Clear old plots
     def clearPlot(self):
@@ -106,25 +122,19 @@ class MainWindow(TemplateBaseClass):
         self.plotNr = 1
         return
     
-    def getCalData(self):
-        calData = self.ooS.getCalData(self.channelActive)
-        self.ui.IValue.setValue(calData[0])
-        self.ui.C0Value.setValue(calData[1])
-        self.ui.C1Value.setValue(calData[2])
-        self.ui.C2Value.setValue(calData[3])
-        
     '''
     Takes the current values of the cal data boxes and plots the fitting curve for checking
     '''    
     def plotCalData(self):
-        I=self.ui.IValue.Value() 
-        C0=self.ui.C0Value.Value()
-        C1=self.ui.C1Value.Value()
-        C2=self.ui.C2Value.Value()
+        I=self.ui.IValue.value() 
+        C0=self.ui.C0Value.value()
+        C1=self.ui.C1Value.value()
+        C2=self.ui.C2Value.value()
         X = []
         for i in range(2046):
             X.append(I + i*C0 + i*C1*C1 + i*C2*C2*C2)
-        pg.plot(X)
+        w = self.ui.graphicsView.plot(X, name='Cal Coeff Curve', pen=self.plotNr)
+        w.addLegend(offset=(60, 30))
         
             
                 

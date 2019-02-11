@@ -244,4 +244,11 @@ class ooSpectro:
                 raw = float(raw)
                 calVal.append(raw)
             return calVal
+        
+        def calculateXScale(self, calList):
+            XScale = []
+            for i in range(2047):
+                XScale.append(calList[0] + i*calList[1] + i*calList[2]*calList[2] + i*calList[3]*calList[3]*calList[3])
+            return XScale
+            
             
