@@ -289,6 +289,9 @@
            </item>
            <item row="1" column="1">
             <widget class="QDoubleSpinBox" name="IValue">
+             <property name="decimals">
+              <number>6</number>
+             </property>
              <property name="minimum">
               <double>-10000.000000000000000</double>
              </property>
@@ -299,6 +302,9 @@
            </item>
            <item row="2" column="1">
             <widget class="QDoubleSpinBox" name="C0Value">
+             <property name="decimals">
+              <number>6</number>
+             </property>
              <property name="minimum">
               <double>-10000.000000000000000</double>
              </property>
@@ -309,6 +315,9 @@
            </item>
            <item row="3" column="1">
             <widget class="QDoubleSpinBox" name="C1Value">
+             <property name="decimals">
+              <number>6</number>
+             </property>
              <property name="minimum">
               <double>-10000.000000000000000</double>
              </property>
@@ -319,6 +328,9 @@
            </item>
            <item row="4" column="1">
             <widget class="QDoubleSpinBox" name="C2Value">
+             <property name="decimals">
+              <number>6</number>
+             </property>
              <property name="minimum">
               <double>-10000.000000000000000</double>
              </property>

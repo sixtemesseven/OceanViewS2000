@@ -15,7 +15,8 @@ import PyQt5.QtGui as qt
 import time
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit
-
+from serial import SerialException
+import serial
 
 pg.mkQApp()
 
@@ -33,13 +34,18 @@ WindowTemplate, TemplateBaseClass = pg.Qt.loadUiType(uiFile)
 
 class MainWindow(TemplateBaseClass):  
     plotNr = 1
-    channel = 0
+    channelActive = 0
+    
+    def __del__(self):
+        self.ooS.__del__
+        
     def __init__(self):
-
-        self.ooS = ooadc.ooSpectro(self.portInput())
-  
+        
         TemplateBaseClass.__init__(self)
-        self.setWindowTitle('pyqtgraph example: Qt Designer')
+        self.setWindowTitle('pyqtgraph example: Qt Designer')    
+        
+        self.ooS = ooadc.ooSpectro()
+        self.portInput()
         
         # Create the main window
         self.ui = WindowTemplate()
@@ -49,7 +55,7 @@ class MainWindow(TemplateBaseClass):
         self.ui.ResetDefaults.clicked.connect(self.resetDefaults)
         self.ui.ClearPlot.clicked.connect(self.clearPlot)
         self.ui.GetDarkMeasurment.clicked.connect(self.darkComp)
-        #self.ui.GetCal.clicked.connect(ooS.getCalData())
+        self.ui.GetCal.clicked.connect(self.getCalData)
         
         self.ui.IntegrationTime.valueChanged.connect(self.setSpectrometer)
         self.ui.BoxcartWidth.valueChanged.connect(self.setSpectrometer)
@@ -61,15 +67,22 @@ class MainWindow(TemplateBaseClass):
     def portInput(self):
         PORT, okPressed = QInputDialog.getInt(None,"Get ADC1000 Serial Port","COM PORT:", 1, 0, 100, 1)
         if okPressed:
-            return PORT
+            if(self.ooS.connectCom(PORT)==False):
+                msg = qt.QMessageBox()
+                msg.setIcon(qt.QMessageBox.Information)
+                msg.setText("\n Serial COM" + str(PORT) + " could not be opened! Check Port or Reboot\n ")
+                msg.setWindowTitle("Serial Error")
+                msg.exec_()
+                print("COM Port not found error, exit program")
+                sys.exit()
         
     def darkComp(self):
         self.ooS.getDarkCompensation(self.channel)
         
     #Sets Channel
     def setChannel(self):
-        self.channel = self.ui.SingleChannel.value()
-        self.ooS.setChannel(self.channel)
+        self.channelActive = self.ui.SingleChannel.value()
+        self.ooS.setChannel(self.channelActive)
         
     #Plotting the spectrum graph
     def plotGraph(self):
@@ -82,9 +95,9 @@ class MainWindow(TemplateBaseClass):
         else:
             X = self.ooS.getCompensatedSpectrum(self.channel)          
         
-        w = self.ui.graphicsView.plot(X)
+        w = self.ui.graphicsView.plot(X, name='')
         w.addLegend(offset=(self.plotNr*60, 30))
-        #TODO optional numbering w.plot(X, name=" Nr: "+str(self.plotNr), pen=self.plotNr)
+        w.plot(X, name=" Nr: "+str(self.plotNr), pen=self.plotNr)
         self.plotNr = self.plotNr + 1
         
     #Clear old plots
@@ -92,7 +105,29 @@ class MainWindow(TemplateBaseClass):
         self.ui.graphicsView.clear()
         self.plotNr = 1
         return
+    
+    def getCalData(self):
+        calData = self.ooS.getCalData(self.channelActive)
+        self.ui.IValue.setValue(calData[0])
+        self.ui.C0Value.setValue(calData[1])
+        self.ui.C1Value.setValue(calData[2])
+        self.ui.C2Value.setValue(calData[3])
         
+    '''
+    Takes the current values of the cal data boxes and plots the fitting curve for checking
+    '''    
+    def plotCalData(self):
+        I=self.ui.IValue.Value() 
+        C0=self.ui.C0Value.Value()
+        C1=self.ui.C1Value.Value()
+        C2=self.ui.C2Value.Value()
+        X = []
+        for i in range(2046):
+            X.append(I + i*C0 + i*C1*C1 + i*C2*C2*C2)
+        pg.plot(X)
+        
+            
+                
         
     #Will trigger when spin box values change and will adjust spectrometer settings
     def setSpectrometer(self):
@@ -101,18 +136,6 @@ class MainWindow(TemplateBaseClass):
         self.ooS.addScans(self.ui.Average.value())
         self.ooS.addScans(self.ui.PlotFrom.value())
         self.ooS.addScans(self.ui.APlotTo.value())
-     
-    #Connect com port, if it is open close the old one and reopen. If exception get popup
-    '''
-    def connectCom(self):
-        port = self.ui.comPort.value()
-        if(self.ooS.connectSpectrometer(port) == False):
-            msg = qt.QMessageBox()
-            msg.setIcon(qt.QMessageBox.Information)
-            msg.setText("\n Serial COM" + str(port) + " could not be opened!\n ")
-            msg.setWindowTitle("Serial Error")
-            msg.exec_()
-            '''
             
     def resetDefaults(self):
         #ooS.resetDefault

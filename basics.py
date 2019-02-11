@@ -2,10 +2,30 @@ from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit
 import pyqtgraph as pg
 import numpy as np
 import ooadc
+import serial
+import serial.tools.list_ports
 
-ss = ooadc.ooSpectro(15)
-print(ss.getSpectrum())
-ss.__del__
+
+
+ssO = ooadc.ooSpectro()
+ssO.connectCom(14)
+print(ssO.getCalData(0))
+ssO.__del__
+
+
+
+'''
+serial.tools.list_ports.comports()
+ser = serial.Serial()
+ser.baud = 9600
+print(ser.is_open)
+ser.port = 'COM14'
+ser.open()
+print(ser.is_open)
+ser.close()
+print(ser.is_open)
+'''
+
 
 
 
@@ -13,7 +33,7 @@ ss.__del__
 '''
 
 spec1 = ooadc.ooSpectro(14)
-#print(spec1.getSpectrum())n
+#print(spec1.getSpectrum())
 ch = 0
 spec1.setIntegrationTime(200)
 #spec1.doDarkCompensation(ch)

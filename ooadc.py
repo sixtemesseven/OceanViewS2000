@@ -9,30 +9,38 @@ Wrapper class for all the RS232 functionality of the ADC1000 board from ocean op
 
 #TODO Get a popup window on connect to open serial port 
 
-import serial as ser
+import serial
 import time
 import numpy as np
 from serial import SerialException
 
 class ooSpectro:
-        firstConnect = False
-        def __init__(self, port):
-            self.s2000 = ser.Serial(None, 9600, timeout=1)
-            if self.firstConnect == True:
-                if self.s2000.isOpen() == True:
-                    self.s2000.close()
-            self.firstConnect = True
-            try:
-                self.s2000 = ser.Serial('COM'+str(port), 9600, timeout=1)
-            except SerialException:
-                return 
-            self.setAsciiMode()
-            self.resetDefault()
+        
+        def __init__(self):
+            self.s2000 = serial.Serial()
+            
             
         def __del__(self):
-            if self.firstConnect == True:
+            if(self.s2000.is_open == True):
                 self.s2000.close()
             del self.s2000
+            
+        '''
+        Connect to com port with 
+        '''
+        def connectCom(self, port):
+            self.s2000.baud = 9600
+            self.s2000.timeout = 10
+            self.s2000.port = 'COM'+str(port)
+            try:
+                self.s2000.open()
+            except SerialException:
+                return False
+
+            self.setAsciiMode()
+            self.resetDefault()
+            time.sleep(0.1)
+            return True
         
         '''
         Sums up number of readings (1-15)
@@ -47,7 +55,7 @@ class ooSpectro:
         n > 3 will slow things down
         '''                
         def setPixelBoxcardWidth(self, n):
-            self.s2000.write(("B"+str(n)+"\x0D").encode)
+            self.s2000.write(("B"+str(n)+"\x0D").encode())
             time.sleep(0.1)
         
         '''
@@ -104,9 +112,9 @@ class ooSpectro:
             if(mode == 0):
                 self.s2000.write(b'P0\x0D')
             if(mode == 1):
-                self.s2000.write(('P1'+str(n)+'\x0D').encode)
+                self.s2000.write(('P1'+str(n)+'\x0D').encode())
             if(mode == 3):
-                self.s2000.write(('P3'+str(x)+str(y)+str(n)+'\x0D').encode)
+                self.s2000.write(('P3'+str(x)+str(y)+str(n)+'\x0D').encode())
             else:
                 print("Partial Pixel Mode out of range")   
             time.sleep(0.1)
@@ -129,7 +137,7 @@ class ooSpectro:
             self.s2000.write(b'S\x0D')
             rawStr = self.s2000.readline().decode("utf-8").split(" ")          
             del rawStr[len(rawStr)-1]
-            time.sleep(0.01) #Interesting, why???
+            time.sleep(0.1) #Interesting, why???
             del rawStr[len(rawStr)-1]
 
             del rawStr[0:8]
@@ -216,31 +224,24 @@ class ooSpectro:
                     compensated.append(measured[i] - dark[i])
                 return compensated
             
-        def getCalData(self):
-            rawStr = []
-            self.s2000.reset_output_buffer()
-            self.s2000.reset_input_buffer()
-            time.sleep(1)
-            self.s2000.write(b'S\x0D')
-            rawStr = self.s2000.readline().decode("utf-8").split(" ")
-            del rawStr[-1]
-            del rawStr[-1]
-            del rawStr[0:8]
-            raw=[]
-            for i in range(len(rawStr)):
-                raw.append(int(rawStr[i]))
-            return raw 
-            
-
-
-            
-            
-            
-            
-        
-
-            
-            
-            
-            
+        def getCalData(self, channel):
+            calVal = []
+            for i in range(4):     
+                eepromSlot = channel + 2 + i
+                self.s2000.reset_output_buffer()
+                self.s2000.reset_input_buffer()
+                time.sleep(0.1)
+                self.s2000.write(('?x'+str(eepromSlot)+'\x0D').encode())
+                time.sleep(1)
+                raw = self.s2000.read_until(b'>')
+                raw = raw.replace(b"\x20", b"")
+                raw = raw.replace(b"\r", b"")
+                raw = raw.replace(b"\n", b"")
+                raw = raw.replace(b"\x3E", b"")
+                raw = raw.replace(b"\x06", b"")
+                raw = raw.replace(("?x"+str(eepromSlot)).encode(), b"")  
+                raw = raw.decode('utf-8')
+                raw = float(raw)
+                calVal.append(raw)
+            return calVal
             
