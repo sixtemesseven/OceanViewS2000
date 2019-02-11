@@ -163,27 +163,6 @@
          </item>
         </layout>
        </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <widget class="QLabel" name="label_5">
-           <property name="text">
-            <string>COM</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="comPort"/>
-         </item>
-         <item>
-          <widget class="QPushButton" name="ConnectPort">
-           <property name="text">
-            <string>Connect</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
       </layout>
      </item>
      <item>

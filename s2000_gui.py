@@ -14,6 +14,7 @@ import ooadc
 import PyQt5.QtGui as qt
 import time
 import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit
 
 
 pg.mkQApp()
@@ -23,13 +24,20 @@ path = os.path.dirname(os.path.abspath(__file__))
 uiFile = os.path.join(path, 'ooadcGui/ooadcGui.ui')
 WindowTemplate, TemplateBaseClass = pg.Qt.loadUiType(uiFile)
 
-ooS = ooadc.ooSpectro()
+
+
+
+
+
 
 
 class MainWindow(TemplateBaseClass):  
     plotNr = 1
     channel = 0
     def __init__(self):
+
+        self.ooS = ooadc.ooSpectro(self.portInput())
+  
         TemplateBaseClass.__init__(self)
         self.setWindowTitle('pyqtgraph example: Qt Designer')
         
@@ -37,11 +45,10 @@ class MainWindow(TemplateBaseClass):
         self.ui = WindowTemplate()
         self.ui.setupUi(self)
         self.ui.PlotSpectrum.clicked.connect(self.plotGraph)
-        self.ui.ConnectPort.clicked.connect(self.connectCom)
         self.ui.Channel.clicked.connect(self.setChannel)
         self.ui.ResetDefaults.clicked.connect(self.resetDefaults)
         self.ui.ClearPlot.clicked.connect(self.clearPlot)
-        self.ui.GetDarkMeasurment.clicked.connect(self.darkComp())
+        self.ui.GetDarkMeasurment.clicked.connect(self.darkComp)
         #self.ui.GetCal.clicked.connect(ooS.getCalData())
         
         self.ui.IntegrationTime.valueChanged.connect(self.setSpectrometer)
@@ -50,25 +57,30 @@ class MainWindow(TemplateBaseClass):
         self.ui.PlotFrom.valueChanged.connect(self.setSpectrometer)
         self.ui.PlotTo.valueChanged.connect(self.setSpectrometer)
         self.show()
+    
+    def portInput(self):
+        PORT, okPressed = QInputDialog.getInt(None,"Get ADC1000 Serial Port","COM PORT:", 1, 0, 100, 1)
+        if okPressed:
+            return PORT
         
     def darkComp(self):
-        ooS.getDarkCompensation(self.channel)
+        self.ooS.getDarkCompensation(self.channel)
         
     #Sets Channel
     def setChannel(self):
         self.channel = self.ui.SingleChannel.value()
-        ooS.setChannel(self.channel)
+        self.ooS.setChannel(self.channel)
         
     #Plotting the spectrum graph
     def plotGraph(self):
         #for i in range(100):
         #    X.append(random.random())
-        X = ooS.getSpectrum()      
+        X = self.ooS.getSpectrum()      
         
-        if(self.ui.ApplyDarkMeasurment.checkStateSet() == True):
-            X = ooS.getSpectrum()
+        if(self.ui.ApplyDarkMeasurment.checkStateSet() == False):
+            X = self.ooS.getSpectrum()
         else:
-            X = ooS.getCompensatedSpectrum(self.channel)          
+            X = self.ooS.getCompensatedSpectrum(self.channel)          
         
         w = self.ui.graphicsView.plot(X)
         w.addLegend(offset=(self.plotNr*60, 30))
@@ -84,21 +96,23 @@ class MainWindow(TemplateBaseClass):
         
     #Will trigger when spin box values change and will adjust spectrometer settings
     def setSpectrometer(self):
-        ooS.setIntegrationTime(self.ui.IntegrationTime.value())
-        ooS.setPixelBoxcardWidth(self.ui.BoxcartWidth.value())
-        ooS.addScans(self.ui.Average.value())
-        ooS.addScans(self.ui.PlotFrom.value())
-        ooS.addScans(self.ui.APlotTo.value())
+        self.ooS.setIntegrationTime(self.ui.IntegrationTime.value())
+        self.ooS.setPixelBoxcardWidth(self.ui.BoxcartWidth.value())
+        self.ooS.addScans(self.ui.Average.value())
+        self.ooS.addScans(self.ui.PlotFrom.value())
+        self.ooS.addScans(self.ui.APlotTo.value())
      
     #Connect com port, if it is open close the old one and reopen. If exception get popup
+    '''
     def connectCom(self):
         port = self.ui.comPort.value()
-        if(ooS.connectSpectrometer(port) == False):
+        if(self.ooS.connectSpectrometer(port) == False):
             msg = qt.QMessageBox()
             msg.setIcon(qt.QMessageBox.Information)
             msg.setText("\n Serial COM" + str(port) + " could not be opened!\n ")
             msg.setWindowTitle("Serial Error")
             msg.exec_()
+            '''
             
     def resetDefaults(self):
         #ooS.resetDefault
@@ -115,5 +129,4 @@ win = MainWindow()
 if __name__ == '__main__':
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
         QtGui.QApplication.instance().exec_()
-        ooS.__del__
 

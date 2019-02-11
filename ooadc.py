@@ -9,29 +9,25 @@ Wrapper class for all the RS232 functionality of the ADC1000 board from ocean op
 
 #TODO Get a popup window on connect to open serial port 
 
-import serial 
+import serial as ser
 import time
 import numpy as np
 from serial import SerialException
 
 class ooSpectro:
         firstConnect = False
-        s2000 = serial
-        def __init__(self):
-            return
-            
-        def connectSpectrometer(self, port):
+        def __init__(self, port):
+            self.s2000 = ser.Serial(None, 9600, timeout=1)
             if self.firstConnect == True:
                 if self.s2000.isOpen() == True:
                     self.s2000.close()
             self.firstConnect = True
             try:
-                self.s2000 = serial.Serial('COM'+str(port), 9600, timeout=1)
+                self.s2000 = ser.Serial('COM'+str(port), 9600, timeout=1)
             except SerialException:
-                return False
+                return 
             self.setAsciiMode()
             self.resetDefault()
-            return True
             
         def __del__(self):
             if self.firstConnect == True:
@@ -73,7 +69,7 @@ class ooSpectro:
         Rotator is active if chan > 255
         '''
         def setChannel(self, chan): 
-            self.s2000.write(('H'+str(chan)+'\x0D').encode)
+            self.s2000.write(("H"+str(chan)+"\x0D").encode())
             time.sleep(0.1)
             
         '''
@@ -131,9 +127,11 @@ class ooSpectro:
             self.s2000.reset_input_buffer()
             time.sleep(0.1)
             self.s2000.write(b'S\x0D')
-            rawStr = self.s2000.readline().decode("utf-8").split(" ")
-            del rawStr[-1]
-            del rawStr[-1]
+            rawStr = self.s2000.readline().decode("utf-8").split(" ")          
+            del rawStr[len(rawStr)-1]
+            time.sleep(0.01) #Interesting, why???
+            del rawStr[len(rawStr)-1]
+
             del rawStr[0:8]
             raw=[]
             for i in range(len(rawStr)):

@@ -1,9 +1,11 @@
+from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit
 import pyqtgraph as pg
 import numpy as np
 import ooadc
 
-ss = ooadc.ooSpectro()
-print(ss.connectSpectrometer(15))
+ss = ooadc.ooSpectro(15)
+print(ss.getSpectrum())
+ss.__del__
 
 
 
