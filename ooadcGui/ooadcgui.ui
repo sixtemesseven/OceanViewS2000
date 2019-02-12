@@ -21,9 +21,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>0</y>
-      <width>1101</width>
-      <height>761</height>
+      <y>190</y>
+      <width>411</width>
+      <height>291</height>
      </rect>
     </property>
    </widget>
@@ -382,6 +382,16 @@
      </item>
     </layout>
    </widget>
+   <widget class="plotMatWidget" name="spectrumGraph">
+    <property name="geometry">
+     <rect>
+      <x>700</x>
+      <y>210</y>
+      <width>256</width>
+      <height>192</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -409,6 +419,11 @@
    <class>PlotWidget</class>
    <extends>QGraphicsView</extends>
    <header>pyqtgraph.h</header>
+  </customwidget>
+  <customwidget>
+   <class>plotMatWidget</class>
+   <extends>QGraphicsView</extends>
+   <header>mplwidget</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -17,6 +17,9 @@ import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit
 from serial import SerialException
 import serial
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 
 pg.mkQApp()
 
@@ -109,8 +112,13 @@ class MainWindow(TemplateBaseClass):
         if(self.ui.ApplyDarkMeasurment.isChecked()):
             Y = self.ooS.getSpectrum()
         else:
-            Y = self.ooS.getCompensatedSpectrum(self.channelActive)          
+            Y = self.ooS.getCompdensatedSpectrum(self.channelActive)          
         X = self.XScaleList  
+        
+        #TODO -- TEST Matplotlib
+        self.plotMatWidget.canvas.ax.plot(X, Y)
+        self.plotMatWidget.canvas.draw()
+        
         self.ui.graphicsView.plot(X,Y,name = " Nr: "+str(self.plotNr),pen=self.plotNr)       
         if(self.ui.ChangeColors.isChecked()):
             self.plotNr = self.plotNr + 1
