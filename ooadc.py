@@ -23,7 +23,9 @@ class ooSpectro:
         def __del__(self):
             if(self.s2000.is_open == True):
                 self.s2000.close()
+                print("com closed")
             del self.s2000
+            print("ooS deleted")
             
         '''
         Connect to com port with 

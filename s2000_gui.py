@@ -17,9 +17,15 @@ import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit
 from serial import SerialException
 import serial
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+
+from PyQt5.QtCore import QSize
+from PyQt5.QtWidgets import QSizePolicy
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as Canvas
 from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
+from matplotlib import rcParams
+rcParams['font.size'] = 9
+from matplotlib.backends.backend_qt5agg import (NavigationToolbar2QT as NavigationToolbar)
+
 
 pg.mkQApp()
 
@@ -40,8 +46,8 @@ class MainWindow(TemplateBaseClass):
     channelActive = 0
     
     def __del__(self):
-        self.ooS.__del__
         
+                
     def __init__(self):
         #Set up main ui winows (goes first!)
         TemplateBaseClass.__init__(self)
@@ -69,6 +75,11 @@ class MainWindow(TemplateBaseClass):
         self.ui.Average.valueChanged.connect(self.setSpectrometer)
         self.ui.PlotFrom.valueChanged.connect(self.setSpectrometer)
         self.ui.PlotTo.valueChanged.connect(self.setSpectrometer)
+        
+        #Add Matplotlib Toolbar
+        self.addToolBar(NavigationToolbar(self.ui.MplWidget.canvas, self))
+        
+        #Show main window
         self.show()
     
     def updateCalData(self):
@@ -110,23 +121,26 @@ class MainWindow(TemplateBaseClass):
     #Plotting the spectrum graph
     def plotGraph(self):
         if(self.ui.ApplyDarkMeasurment.isChecked()):
-            Y = self.ooS.getSpectrum()
+            Y = self.ooS.getCompensatedSpectrum(self.channelActive) 
         else:
-            Y = self.ooS.getCompdensatedSpectrum(self.channelActive)          
+            Y = self.ooS.getSpectrum()
+                     
         X = self.XScaleList  
         
-        #TODO -- TEST Matplotlib
-        self.plotMatWidget.canvas.ax.plot(X, Y)
-        self.plotMatWidget.canvas.draw()
+        self.ui.MplWidget.canvas.axes.plot(X, Y)
+        self.ui.MplWidget.canvas.axes.legend((str(self.plotNr)),loc='upper right')
+        self.ui.MplWidget.canvas.axes.set_title('Spectrum')
+        self.ui.MplWidget.canvas.draw()
         
-        self.ui.graphicsView.plot(X,Y,name = " Nr: "+str(self.plotNr),pen=self.plotNr)       
-        if(self.ui.ChangeColors.isChecked()):
-            self.plotNr = self.plotNr + 1
-            print(self.plotNr)
+        ##Pygrapgh implementation (OLD)
+        #self.ui.graphicsView.plot(X,Y,name = " Nr: "+str(self.plotNr),pen=self.plotNr)       
+        #if(self.ui.ChangeColors.isChecked()):
+        #    self.plotNr = self.plotNr + 1
+        #    print(self.plotNr)
         
     #Clear old plots
     def clearPlot(self):
-        self.ui.graphicsView.clear()
+        self.ui.MplWidget.canvas.axes.clear()
         self.plotNr = 1
         return
     
@@ -170,4 +184,5 @@ win = MainWindow()
 if __name__ == '__main__':
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
         QtGui.QApplication.instance().exec_()
+        self.ooS.__del__
 
