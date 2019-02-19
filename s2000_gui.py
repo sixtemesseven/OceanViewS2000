@@ -35,18 +35,13 @@ uiFile = os.path.join(path, 'ooadcGui/ooadcGui.ui')
 WindowTemplate, TemplateBaseClass = pg.Qt.loadUiType(uiFile)
 
 
-
-
-
-
-
-
 class MainWindow(TemplateBaseClass):  
     plotNr = 1
     channelActive = 0
     
     def __del__(self):
-        
+        self.ooS.__del__
+        return
                 
     def __init__(self):
         #Set up main ui winows (goes first!)
@@ -140,7 +135,7 @@ class MainWindow(TemplateBaseClass):
         
     #Clear old plots
     def clearPlot(self):
-        self.ui.MplWidget.canvas.axes.clear()
+        self.ui.MplWidget.canvas.axes.cla()
         self.plotNr = 1
         return
     
@@ -158,9 +153,6 @@ class MainWindow(TemplateBaseClass):
         w = self.ui.graphicsView.plot(X, name='Cal Coeff Curve', pen=self.plotNr)
         w.addLegend(offset=(60, 30))
         
-            
-                
-        
     #Will trigger when spin box values change and will adjust spectrometer settings
     def setSpectrometer(self):
         self.ooS.setIntegrationTime(self.ui.IntegrationTime.value())
@@ -176,13 +168,11 @@ class MainWindow(TemplateBaseClass):
         self.ui.Average.setValue(0)
         self.ui.PlotFrom.setValue(0)
         self.ui.PlotTo.setValue(2046)
-        
-        
+           
 win = MainWindow()
-
 
 if __name__ == '__main__':
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
         QtGui.QApplication.instance().exec_()
-        self.ooS.__del__
+        
 

@@ -57,53 +57,29 @@
       </layout>
      </item>
      <item>
-      <widget class="QPushButton" name="ClearPlot">
-       <property name="text">
-        <string>Clear Plot</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="QuickMeas">
-       <property name="text">
-        <string>Quick Meas</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="AddRider">
-       <property name="text">
-        <string>Add Rider</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="Persistance">
-       <property name="text">
-        <string>Persistent Plot</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="getDataContiniously">
-       <property name="text">
-        <string>Get Data Continiously</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="ShowLegend">
-       <property name="text">
-        <string>Show Legend</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="ChangeColors">
-       <property name="text">
-        <string>Change Colors</string>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="text">
+          <string>NextLeft</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_2">
+         <property name="text">
+          <string>Peak</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_3">
+         <property name="text">
+          <string>NextRight</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -154,6 +130,13 @@
         </layout>
        </item>
       </layout>
+     </item>
+     <item>
+      <widget class="QPushButton" name="ClearPlot">
+       <property name="text">
+        <string>Clear Plot</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="Line" name="line">
@@ -376,7 +359,7 @@
     <property name="geometry">
      <rect>
       <x>80</x>
-      <y>10</y>
+      <y>0</y>
       <width>1031</width>
       <height>761</height>
      </rect>
